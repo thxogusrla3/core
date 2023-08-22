@@ -15,8 +15,7 @@ public class OrderServiceImpl implements OrderService{
      * fix -> rate로 변경되면서 dip가 위반 됐다.
      * 이를 해결하기 위해 코드 수정이 필요하다.
      */
-//    private final DiscountPolicy discountPolicy = new FixDiscountPolicy();
-//    private final DiscountPolicy discountPolicy = new RateDiscountPolicy();
+//    private final DiscountPolicy discountPolicy = new FixDiscountPolicy(); -> new RateDiscountPolicy();
 
     /**
      * dip를 지키기 위한 코드
