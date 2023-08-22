@@ -1,9 +1,9 @@
 package hello.core.member;
 
 public class Member {
-    private Long id;
-    private String name;
-    private Grade grade;
+    private Long id; //id
+    private String name; //이름
+    private Grade grade; //등급
 
     public Member(Long id, String name, Grade grade) {
         this.id = id;

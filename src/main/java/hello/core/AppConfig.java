@@ -28,11 +28,13 @@ public class AppConfig {
     public static MemoryMemberRepository getMemberRepository() {
         return new MemoryMemberRepository();
     }
+
     @Bean
     public DiscountPolicy discountPolicy() {
 //        return new FixDiscountPolicy();
         return new RateDiscountPolicy();
     }
+
     @Bean
     public MemberService memberService() {
         return new MemberServiceImpl(getMemberRepository());
