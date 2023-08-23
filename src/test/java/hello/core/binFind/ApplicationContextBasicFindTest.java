@@ -9,6 +9,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import static org.assertj.core.api.Assertions.*;
@@ -17,21 +18,21 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class ApplicationContextBasicFindTest {
 
     AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext(AppConfig.class);
-
     @Test
     @DisplayName("빈 이름 조회")
     void findBeanByName() {
+        //getBean()
         MemberService memberService = ac.getBean("memberService", MemberService.class);
         System.out.println("memberService = " + memberService);
 
-        //검증은 Assertions.assertThat
+        //검증은 Assertions.assertThat(alt+enter)
         //memberService instanceof MemberServiceImpl.class 는 memberService 는 MemberServiceImpl 타입으로 받을 수 있는지 를 묻는 것인데요.
         assertThat(memberService).isInstanceOf(MemberServiceImpl.class);
 
     }
 
     @Test
-    @DisplayName("이름 없이 타입으로만 조회")
+    @DisplayName("이름 없이 클래스 타입으로만 조회")
     void findBeanByType() {
         MemberService memberService = ac.getBean(MemberService.class);
         System.out.println("memberService = " + memberService);
@@ -40,10 +41,12 @@ public class ApplicationContextBasicFindTest {
         assertThat(memberService).isInstanceOf(MemberServiceImpl.class);
     }
 
+    //get
+
     @Test
-    @DisplayName("구체 타입으로 조회")
+    @DisplayName("구체 타입으로 조회") //이 방식을 사용하면 유연성이 떨어짐. 역할과 구현을 나눠야 하는데 둘다 쓰기 때문
     void findBeanByName2() {
-        MemberService memberService = ac.getBean("memberService", MemberServiceImpl.class);
+        MemberServiceImpl memberService = ac.getBean("memberService", MemberServiceImpl.class);
         System.out.println("memberService = " + memberService);
 
         //검증은 Assertions.assertThat

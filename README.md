@@ -142,6 +142,7 @@ public class OrderServiceImpl implements OrderService{
 1. ApplicationContext 
    - 스프링 컨테이너라 한다.
    - @Configuration 어노테이션이 붙은 AppConfig의 @Bean이 붙은 메소드들을 다 스프링 컨테이너에 등록한다.
+   - BeanFactory, ApplicationContext 둘 다 스프링 컨테이너라 부른다.
 
 ```java
 class container{
@@ -157,5 +158,45 @@ class container{
 }
 
 ```
-# 섹션3
+
 > **좋은 객체지향이란 solid 원칙을 지키는 것이다. 하지만 다형성만으로는 OCP, DIP 만족시킬 수 없는데 이를 만족하기 위해 컨테이너라는 개념이 등장했고, 이는 스프링이 필요한 이유라는 것을 지금까지 학습한 것이다.**
+
+# 빈 이름 조회하기
+```java
+class FindBean {
+   AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext(AppConfig.class);
+    //1. bean 이름으로 조회
+    MemberService memberService = ac.getBean("memberService", MemberService.class);
+    
+    //2. bean 타입으로 조회
+    MemberService memberService = ac.getBean(MemberService.class);
+
+    //3. 구체 타입으로 조회,  유연성이 떨어짐 역할과 구현을 나눠야 하는데 그렇지 못하기 때문에
+    MemberServiceImpl memberService = ac.getBean("memberService", MemberServiceImpl.class);
+    
+}
+```
+
+# BeanFactory 와 ApplicationContext
+1. BeanFactory
+   - 스프링 컨테이너의 최상위 인터페이스
+   - 스프링 빈을 관리하고 조회하는 역할을 담당한다.
+   - getBean() 외에도 대부분의 기능은 BeanFactory가 제공하는 기능이다.
+   
+   <br/>
+
+2. ApplicationContext
+   - BeanFactory를 상속받아 빈을 관리 및 검색하는 기능을 제공한다.
+   - EnvironmentCapable, ListableBeanFactory, HierarchicalBeanFactory, MessageSource, ApplicationEventPublisher, ResourcePatternResolver 을 상속받는다.
+
+   <br/>
+3. ApplicationContext 사용하는 이유
+   - 메세지소스를 활용한 국제화 기능(MessageSource)
+   - 환경변수(EnvironmentCapable)
+   - 애플리케이션 이벤트(ApplicationEventPublisher)
+   - 편리한 리소스 조회(ResourcePatternResolver)
+
+4. 스프링 컨테이너 형식
+   - 자바 코드: new AnnotationConfigApplicationContext(AppConfig.class);
+   - XML: 레거시
+   - groovy

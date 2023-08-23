@@ -15,6 +15,22 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 class ApplicationContextExtendsFindTest {
+    //println 은 되도록이면 제거하는 것이 좋다.
+    @Configuration
+    static class TestConfig {
+        //같은 DiscountPolicy 로 하는 이유는 역할과 구현을 나누기 때문이다.
+        //이건 좀더 알아봐야겠다..
+        @Bean
+        public DiscountPolicy rateDiscountPolicy() {
+            return new RateDiscountPolicy();
+        }
+
+        @Bean
+        public DiscountPolicy fixDiscountPolicy() {
+            return new FixDiscountPolicy();
+        }
+    }
+
     AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext(TestConfig.class);
 
     @Test
@@ -53,23 +69,12 @@ class ApplicationContextExtendsFindTest {
     @Test
     @DisplayName("부모 타입으로 모두 조회하기 - Object")
     void findAllBeanByObjectType() {
+        //자바 객체는 Object 타입이다. 그렇기 떄문에 Object 타입으로 조회 시
+        //모든 빈 객체가 조회된다.
         Map<String, Object> beansOfType = ac.getBeansOfType(Object.class);
         for (String key : beansOfType.keySet()) {
             System.out.println("key = " + key + " value=" +
                     beansOfType.get(key));
-        }
-    }
-
-    @Configuration
-    static class TestConfig {
-        @Bean
-        public DiscountPolicy rateDiscountPolicy() {
-            return new RateDiscountPolicy();
-        }
-
-        @Bean
-        public DiscountPolicy fixDiscountPolicy() {
-            return new FixDiscountPolicy();
         }
     }
 }
