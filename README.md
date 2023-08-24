@@ -200,3 +200,31 @@ class FindBean {
    - 자바 코드: new AnnotationConfigApplicationContext(AppConfig.class);
    - XML: 레거시
    - groovy
+
+# 웹 애플리케이션과 싱글톤
+1. 싱글톤이란
+   - 웹 애플리케이션은 사용자가 100개의 요청을 보내면 100개의 객체를 생성해야하는데, 이렇게 되면 메모리 낭비가 심하다.
+   - 이를 위해 클래스의 한개의 객체만 생성하고 공유하도록 하는게 싱글톤이다.
+
+```java
+public class SingletonService {
+    //클래스 멤버변수로 생성을 하게 되면 클래스가 로드 될 때 클래스 멤버변수들도 함께 로드되고 모든 영역에 공유 된다.
+    //이렇게 한개를 생성을 하고, 여러가지 방법으로 한개만 생성하게 막을 수 있다.
+    private static final SingletonService instance = new SingletonService();
+    public static SingletonService getInstance() {
+        return instance;
+    }
+    
+    //private 생성자를 사용하여 객체를 더 생성하지 못하게 막아주는 방법.
+    private SingletonService() {}
+}
+```
+2. 싱글톤 패턴 문제점
+   - 구현이 어렵다.
+   - 구체 클래스에 의존한다 -> DIP 위반한다. / OCP 원칙을 위반할 가능성이 높다.
+   - 유연성이 떨어지며 안티패턴으로 불리기도 한다.
+
+# 싱글톤 컨테이너
+1. 싱글톤 컨테이너란?
+   - 스프링 컨테이너는 싱글톤 패턴을 적용하지 않아도, 객체 인스턴스를 싱글톤(1개만 생성)으로 관리한다.
+   - 지금까지 학습한 스프링 빈이 바로 싱글톤으로 관리되는 빈이다.
