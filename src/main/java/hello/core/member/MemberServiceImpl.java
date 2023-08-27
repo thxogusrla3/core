@@ -12,6 +12,8 @@ public class MemberServiceImpl implements MemberService{
     
     // 추상화만 의존한 상태
     private final MemberRepository memberRepository ;
+
+    // 구체화도 의존한 상태, DIP 위반
     private final MemberRepository memberRepository1 = new MemoryMemberRepository();
 
     //추상화만 의존하고 있는 코드임.
@@ -27,5 +29,10 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public Member findMember(Long memberId) {
         return memberRepository.findById(memberId);
+    }
+
+    //테스트 용도
+    public MemberRepository getMemberRepository() {
+        return memberRepository;
     }
 }

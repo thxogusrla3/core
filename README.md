@@ -228,3 +228,23 @@ public class SingletonService {
 1. 싱글톤 컨테이너란?
    - 스프링 컨테이너는 싱글톤 패턴을 적용하지 않아도, 객체 인스턴스를 싱글톤(1개만 생성)으로 관리한다.
    - 지금까지 학습한 스프링 빈이 바로 싱글톤으로 관리되는 빈이다.
+
+# 싱글톤 방식의 주의점
+- 싱글톤 패턴은 여러 클라이언트가 하나의 같은 객체 인스턴스를 공유하기 때문에 싱글톤 객체는 상태를 유지(stateful)하게 설계하면 안된다.
+- 무상태(stateless)로 설계해야 한다.
+- 즉 A 클라이언트의 부분을 B 클라이언트가 값을 변경할 수 있게 하면 안된다.
+
+# 같은 빈 호출 시
+- 아래 코드와 같이 MemoryMemberRepository를 세번 호출한다 해도 하나의 객체만 생성이되어 싱글톤을 지킬 수 있게된다.
+
+```java
+public class test { 
+    MemberServiceImpl memberService   = ac.getBean("memberService",    MemberServiceImpl.class);
+    OrderServiceImpl orderService     = ac.getBean("orderService",     OrderServiceImpl.class);
+    MemberRepository memberRepository = ac.getBean("memberRepository", MemberRepository.class);
+
+    //sout("memberService -> memberRepository = " + memberService.getMemberRepository());
+    //sout("orderService  -> memberRepository = " + orderService.getMemberRepository());
+    //sout("memberRepository = " + memberRepository);
+}
+```

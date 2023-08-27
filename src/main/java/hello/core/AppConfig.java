@@ -4,6 +4,7 @@ package hello.core;
 import hello.core.discount.DiscountPolicy;
 import hello.core.discount.FixDiscountPolicy;
 import hello.core.discount.RateDiscountPolicy;
+import hello.core.member.MemberRepository;
 import hello.core.member.MemberService;
 import hello.core.member.MemberServiceImpl;
 import hello.core.member.MemoryMemberRepository;
@@ -25,7 +26,21 @@ import org.springframework.context.annotation.Configuration;
 public class AppConfig {
 
     @Bean
-    public static MemoryMemberRepository getMemberRepository() {
+    public MemberService memberService() {
+        System.out.println("call AppConfig.memberService");
+        return new MemberServiceImpl(memberRepository());
+    }
+    
+    @Bean
+    public OrderService orderService() { //새로운 구조와 할인 정책 적용
+        System.out.println("call AppConfig.orderService");
+        return new OrderServiceImpl(memberRepository(), discountPolicy());
+    }
+
+    @Bean
+    public MemberRepository memberRepository() {
+        //단축키 soutm
+        System.out.println("call AppConfig.memberRepository");
         return new MemoryMemberRepository();
     }
 
@@ -33,16 +48,6 @@ public class AppConfig {
     public DiscountPolicy discountPolicy() {
 //  return new FixDiscountPolicy(); fix와 rete를 appconfig 이기 때문에 변경해가면서 사용하면 된다.
         return new RateDiscountPolicy();
-    }
-
-    @Bean
-    public MemberService memberService() {
-        return new MemberServiceImpl(getMemberRepository());
-    }
-    
-    @Bean
-    public OrderService orderService() { //새로운 구조와 할인 정책 적용
-        return new OrderServiceImpl(getMemberRepository(), discountPolicy());
     }
 
  }
