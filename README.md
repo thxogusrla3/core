@@ -236,6 +236,7 @@ public class SingletonService {
 
 # 같은 빈 호출 시
 - 아래 코드와 같이 MemoryMemberRepository를 세번 호출한다 해도 하나의 객체만 생성이되어 싱글톤을 지킬 수 있게된다.
+- 위는 @Configruation 이 CGLIB 바이트코드 조작 라이브러리를 제공하여 싱글톤으로 빈에 등록될 수 있게 하기 때문에 가능하다.
 
 ```java
 public class test { 
@@ -246,5 +247,22 @@ public class test {
     //sout("memberService -> memberRepository = " + memberService.getMemberRepository());
     //sout("orderService  -> memberRepository = " + orderService.getMemberRepository());
     //sout("memberRepository = " + memberRepository);
+}
+```
+
+# @Comfiguration과 바이트코드 조작
+- AnnotationConfigApplicationContext에 파라미터로 넘긴 값은 스프링 빈으로 등록된다.
+- Appconfig 를 빈에 등록하면 CGLIB가 붙어 등록이 되며, 이는 바이트코드 조작 라이브러리를 사용해서 Appconfig를 빈에 등록했다는 뜻이다.
+- @Configuration 을 붙이면 바이트코드를 조작하는 CGLB 기술을 사용해서 해서 싱글톤을 보장한다.
+- @Configuration을 적용하지 않고, @Bean만 적용하게 된다면 싱글톤을 보장하지 않는다.
+
+```java
+class test {
+    void configurationDeep() {
+        ApplicationContext ac = new AnnotationConfigApplicationContext(AppConfig.class);
+        AppConfig bean = ac.getBean(AppConfig.class);
+        System.out.println("bean = " + bean.getClass()); //
+        //출력: bean = class hello.core.AppConfig$$EnhancerBySpringCGLIB$$bd479d70
+    }
 }
 ```
