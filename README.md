@@ -162,6 +162,7 @@ class container{
 > **좋은 객체지향이란 solid 원칙을 지키는 것이다. 하지만 다형성만으로는 OCP, DIP 만족시킬 수 없는데 이를 만족하기 위해 컨테이너라는 개념이 등장했고, 이는 스프링이 필요한 이유라는 것을 지금까지 학습한 것이다.**
 
 # 빈 이름 조회하기
+> 스프링 빈을 조회할 때 부모타입으로 조회하는 이유는 자식 타입도 함께 조회되기 때문이다.
 ```java
 class FindBean {
    AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext(AppConfig.class);
@@ -178,6 +179,7 @@ class FindBean {
 ```
 
 # BeanFactory 와 ApplicationContext
+> 이 둘은 스프링 컨테이너라 불리며, ApplicationContext은 BeanFactory 를 상속 받는다.
 1. BeanFactory
    - 스프링 컨테이너의 최상위 인터페이스
    - 스프링 빈을 관리하고 조회하는 역할을 담당한다.
@@ -264,5 +266,36 @@ class test {
         System.out.println("bean = " + bean.getClass()); //
         //출력: bean = class hello.core.AppConfig$$EnhancerBySpringCGLIB$$bd479d70
     }
+}
+```
+
+# 컴포넌트 스캔
+
+## 1. @ComponentScan
+- @ComponentScan 은 @Component 어노테이션이 붙은 것들을 스프링 빈에 등록한다.
+- MemberServiceImpl -> memberServiceImpl 로 스프링 빈에 등록이 된다. 
+```java
+@Configuration
+@ComponentScan(excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Configuration.class)) //예제코드를 살리기 위해 이 코드를 추가함.
+public class AutoAppConfig {
+
+}
+
+```
+
+## 2. @Autowired
+- @Autowired 는 의존관계를 자동으로 주입해준다.
+- 생성자에 @Autowired를 설정해주면 생성자 파라미터의 객체들에 맞게 스프링 빈에서 찾아서 주입해준다.
+```java
+@Component //OrderServiceImpl의 클래스가 빈에 등록되며 맨 앞에만 소문자로 바뀌어 orderserviceImpl로 저장이된다.
+public class OrderServiceImpl implements OrderService {
+   private final MemberRepository memberRepository;
+   private final DiscountPolicy discountPolicy;
+   
+   @Autowired //MemberRepository와 같은 타입의 
+   public OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy discountPolicy) {
+      this.memberRepository = memberRepository;
+      this.discountPolicy = discountPolicy;
+   }
 }
 ```
