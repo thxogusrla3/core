@@ -299,3 +299,64 @@ public class OrderServiceImpl implements OrderService {
    }
 }
 ```
+
+# 탐색 위치와 기본 스캔 대상
+## 1. ComponentScan - basePackages
+- 탐색할 패키지의 시작 위치를 지정한다.
+- 지정하지 않는다면 @ComponentScan이 붙은 설정 정보 클래스의 패키지가 시작 위치가 된다.
+- 최상단에 위치하게 두는 것이 좋으며, 스프링 부트는 @SpringBootApplication 에서 관리된다.
+```java
+class temp {
+   @ComponentScan(
+           basePackages = "hello.core"
+   )
+   public class AutoAppConfig {
+       
+   }
+}
+```
+
+## 2. ComponentScan 기본 대상
+- @Component  : 컴포넌트 스캔에서 사용
+- @Controller : 스프링 MVC 컨트롤러에서 사용
+- @Service    : 스프링 비즈니스 로직에서 사용
+- @Repository : 스프링 데이터 접근 계층에서 사용, 데이터 계층의 예외를 스프링 예외로 변환해준다.
+- @Configuration : 스프링 설정 정보에서 사용
+
+## 3. 필터
+- includeFilters: 컴포넌트 스캔 대상을 추가로 지정한다.
+- excludeFilters: 컴포넌트 스캔에서 제외할 대상을 지정한다.
+
+```java
+public class ComponentFilterAppConfigTest {
+    @Test
+    void filterScan() {
+        ApplicationContext ac = new AnnotationConfigApplicationContext(ComponentFilterAppConfig.class);
+
+        BeanA beanA = ac.getBean("beanA", BeanA.class);
+        assertThat(beanA).isNotNull();
+
+        assertThrows(
+                NoSuchBeanDefinitionException.class,
+                () -> ac.getBean("beanB", BeanB.class)
+        );
+
+    }
+
+    @Configuration
+    @ComponentScan(
+            includeFilters = @Filter(type = FilterType.ANNOTATION, classes = MyIncludeComponent.class),
+            excludeFilters = @Filter(type = FilterType.ANNOTATION, classes = MyExcludeComponent.class)
+    )
+    static class ComponentFilterAppConfig{
+    }
+}
+```
+
+# 중복 등록과 충돌 
+
+### 1) 자동 빈 등록 && 자동 빈 등록
+- 스프링에서 ConflictingBeanDefinitionException 예외 발생시킴
+### 2) 수동 빈 등록 && 자동 빈 등록
+- 수동 빈이 우선으로 등록되어 문제가 없지만 규모가 큰 프로젝트에서는 이 부분이 애매한 버그를 발생시켜 해결하기 어려울 수 있다.
+- 위에 상황으로 인해 스프링 부트 자체에서 해당 부분에 대해 오류를 발생시킨다.
