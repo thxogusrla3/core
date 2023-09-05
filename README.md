@@ -360,3 +360,62 @@ public class ComponentFilterAppConfigTest {
 ### 2) 수동 빈 등록 && 자동 빈 등록
 - 수동 빈이 우선으로 등록되어 문제가 없지만 규모가 큰 프로젝트에서는 이 부분이 애매한 버그를 발생시켜 해결하기 어려울 수 있다.
 - 위에 상황으로 인해 스프링 부트 자체에서 해당 부분에 대해 오류를 발생시킨다.
+
+# 의존관계 자동 주입
+## 1. 의존관계 주입 방식 4가지
+- 1) 생성자 주입
+  - 생성자 호출시점에 한번만 호출되는 것이 보장되므로 불변, 필수 의존관계에서 사용한다.
+  - 생성자가 딱 1개만 있으면 @Autowired를 생략해도 자동 주입된다.
+```java
+@Component
+class OrderServiceImpl implements OrderService {
+    @Autowired
+    pubilc OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy discountPolicy) {
+        this.memberRepository = memberRepository;
+        this.discountPolicy = discountPolicy;
+    }    
+}
+```
+- 2) setter 주입
+   - 생성자 호출시점에 한번만 호출되는 것이 보장되므로 불변, 필수 의존관계에서 사용한다.
+```java
+@Component
+class OrderServiceImpl implements OrderService {
+    @Autowired
+    public void setMemberRepository(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
+    }
+    @Autowired
+    public void setDiscountPolicy(DiscountPolicy discountPolicy) {
+        this.discountPolicy = discountPolicy;
+    }
+}
+```
+- 3) 필드 주입
+  - 외부에서 변경이 불가능 해서 테스트 하기 힘들기 때문에 사용을 지양한다.
+```java
+@Component
+public class OrderServiceImpl implements OrderService {
+   @Autowired
+   private MemberRepository memberRepository;
+   
+   @Autowired
+   private DiscountPolicy discountPolicy;
+}
+```
+- 4) 일반 메서드 주입
+   - 수정자 주입과 비슷하다
+```java
+@Component
+public class OrderServiceImpl implements OrderService {
+    private MemberRepository memberRepository;
+    private DiscountPolicy discountPolicy;
+    
+    @Autowired
+    public void init(MemberRepository memberRepository, DiscountPolicy discountPolicy) {
+        this.memberRepository = memberRepository;
+        this.discountPolicy = discountPolicy;
+    }
+}
+```
+```
