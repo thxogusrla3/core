@@ -418,4 +418,90 @@ public class OrderServiceImpl implements OrderService {
     }
 }
 ```
+
+# 옵션처리
+> 자동 주입 대상이 스프링 빈이 아닐 때 Autowired 가 걸린다면 터진다. 이를 해결하기 위해 옵션처리가 존재한다.
+- @Autowired(required = false): 자동 주입할 대상이 없으면 수정자 메서드 자체가 호출되지 않음.
+- @Nullable: 자동 주입할 대상이 없으면 null 이 입력된다.
+- Optional<>: 자동 주입할 대상이 없으면 Optional.empty 가 입력된다.
+
+```java
+public class AutowiredTest {
+
+    @Test
+    void AutowiredOption() {
+        ApplicationContext ac = new AnnotationConfigApplicationContext(TestBean.class);
+    }
+
+    static class TestBean {
+
+        /**
+         * required = false 해주면 의존관계가 없으면 애초에 호출이 되지 않는다.
+         * Member 는 스프링 빈이 아니기 떄문에 null 이다.
+         * */
+        @Autowired(required = false)
+        public void setNoBean1(Member noBean1) {
+            System.out.println("noBean1 = " + noBean1);
+        }
+
+        /**
+         * @Nullable 이면 주입할 대상이 없다하더라도 호출한다.
+         * */
+        @Autowired
+        public void setNoBean2(@Nullable Member noBean2) {
+            System.out.println("TestBean.setNoBean2 = " + noBean2);
+            //출력: TestBean.setNoBean2 = null
+        }
+
+        @Autowired
+        public void setNoBean3(Optional<Member> noBean3) {
+            System.out.println("TestBean.setNoBean3 = " + noBean3);
+            //출력: TestBean.setNoBean3 = Optional.empty
+        }
+    }
+}
+```
+
+# 생성자 주입 방식을 써야하는 이유
+- 테스트 할 때 수정자로 주입 해주게 되면 setter 값이 누락되었을 경우 실행은 잘되지만 수정자로 주입이 되지 않아 NPE가 뜬다.
+- 생성자로 주입한 경우 이러한 오류까지 뜨게 되므로 생성자를 사용해야 테스트에 효과적이다.
+- final 키워드를 사용하게 되면 컴파일 시점에 막아주기 때문에 써두면 테스트에 효과적이다.
+```java
+public class OrderServiceImpl implements OrderService{
+    private final MemberRepository memberRepository;
+    private final DiscountPolicy discountPolicy;
+    
+    //아래와 같이 수정자로 호출 해줄 경우
+    public void setMemberRepository(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
+    }
+    
+    //...
+}
+
+class Test() {
+    @Test
+    void createOrder() {
+        OrderServiceImpl orderService = new OrderServiceImpl();
+        orderService.createOrder(1L, "itemA", 10000);
+    }
+}
+```
+
+# Lombok
+```java
+@Component
+@RequriedArgsConstructor // final 멤버변수와 함께 아래 주석친 생성자를 만들어줌 
+class OrderSErviceImpl{ 
+    private final MemberRepository memberRepository;
+    private final DiscountPolicy discountPolicy;
+
+    //@RequiredArgsConstructor 이 어노테이션을 사용하게 되면 아래와 같이 final 키워드가 붙은 멤버변수들 파라미터로 갖는 생성자를 자동으로 만들어준다.
+    @Autowired
+    public OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy discountPolicy) {
+       this.memberRepository = memberRepository;
+       this.discountPolicy = discountPolicy;
+    }
+}
+
 ```
