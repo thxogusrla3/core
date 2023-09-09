@@ -6,7 +6,7 @@ import hello.core.member.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class OrderServiceImpl_old implements OrderService{
     //final은 상수로써 값이 무조건 있어야 함.
 //    private final MemberRepository memberRepository = new MemoryMemberRepository();

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService{
     private final MemberRepository memberRepository;
-    private final DiscountPolicy discountPolicy;
+    private final DiscountPolicy rateDiscountPolicy;
 
 /**
  * @RequiredArgsConstructor 이 어노테이션을 사용하게 되면 아래와 같이 final 키워드가 붙은 멤버변수들 파라미터로 갖는 생성자를 자동으로 만들어준다.
@@ -30,7 +30,7 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public Order createOrder(Long memberId, String itemName, int itemPrice) {
         Member member = memberRepository.findById(memberId); //회원을 조회
-        int discountPrice = discountPolicy.discount(member, itemPrice);
+        int discountPrice = rateDiscountPolicy.discount(member, itemPrice);
 
         return new Order(memberId, itemName, itemPrice, discountPrice);
     }

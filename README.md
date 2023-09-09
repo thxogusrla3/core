@@ -270,6 +270,7 @@ class test {
 ```
 
 # 컴포넌트 스캔
+> @ComponentScan이 스프링 컨테이너에 빈으로 등록해주고 @Autowired 는 등록된 빈들을 찾아 의존성 주입 함
 
 ## 1. @ComponentScan
 - @ComponentScan 은 @Component 어노테이션이 붙은 것들을 스프링 빈에 등록한다.
@@ -504,4 +505,75 @@ class OrderSErviceImpl{
     }
 }
 
+```
+
+# 같은 타입의 빈이 두개 이상일 때 문제
+> 하위 타입이 두개 이상 일 때, 스프링 빈으로 등록하게 되면 상위 타입에 의존 관계 주입 시 문제가 생긴다. <br/>
+> @Qulifier, @Primary 를 사용해서 해결한다.
+
+## 문제예제
+- DiscountPolicy 의 하위 타입인 FixDiscountPolicy, RateDiscountPolicy 둘 다 빈으로 등록했을 때
+- @Autowired DiscountPloicy discountpolicy를 하게 되면 오류가 난다.
+```java
+class Temp {
+    
+    @Component
+    public class FixDiscountPolicy implements DiscountPolicy {}
+   
+    @Component
+    public class RateDiscountPolicy implements DiscountPolicy {}
+
+    @Autowired
+    private DiscountPolicy discountPolicy;
+}
+```
+
+## 문제해결
+1) 필드 명을 빈 이름으로 변경
+   - @Autowired private DiscountPolicy rateDiscountPolicy;
+   - 타입 매칭을 먼저 시도하고 여러 빈이 있으면, 필드 이름, 파라미터 이름으로 빈 이름을 추가 매칭한다.
+   
+2) Qualifier 사용
+   - @Qualifier 는 추가 구분자를 붙여주는 방법, 주입 시 추가적인 방법을 제공하는 것이지만 빈 이름을 변경하는 것은 아니다.
+   - @Qualifier("mainDiscountPolicy") 를 못찾는다면  mainDiscountPolicy 으로 등록된 빈을 찾는다.
+```java
+class Qualifier {
+    @Component
+    @Qualifier("mainDiscountPolicy")
+    public class RateDiscountPolicy implements DiscountPolicy {}
+   
+    @Component
+    @Qualifier("fixDiscountPolicy")
+    public class FixDiscountPolicy implements DiscountPolicy {}
+    
+   //생성자 자동주입 예시
+   @Autowired
+   public OrderServiceImpl(MemberRepository memberRepository,
+                           @Qualifier("mainDiscountPolicy") DiscountPolicy
+                                   discountPolicy) {
+      this.memberRepository = memberRepository;
+      this.discountPolicy = discountPolicy;
+   }
+}
+```
+
+3) @Primary 사용
+   - @Primary 는 우선순위를 정하는 방법이다. @Autowired 시 여러 빈이 매칭되면 @Primary 가 우선권을 가진다.
+   - @Primay와 @Qualifier 둘 다 붙는다면 우선순위는 @Qualifier가 먼저 가져간다.
+```java
+class Primary {
+    @Component
+    @Primary
+    public class RateDiscountPolicy implements DiscountPolicy {}
+   
+    @Component
+    public class FixDiscountPolicy implements DiscountPolicy {}
+    
+   //생성자 자동주입 예시
+   @Autowired
+   public OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy discountPolicy) {
+      this.memberRepository = memberRepository;
+      this.discountPolicy = discountPolicy;
+   }
+}
 ```
