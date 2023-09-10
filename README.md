@@ -577,3 +577,52 @@ class Primary {
    }
 }
 ```
+
+# Annotation 생성하기
+- public @interface MainDiscountPolicy {};
+
+# 조회한 빈이 모두 필요할 때, List, Map
+>List, Map 을 사용하여 스프링 컨테이너에 등록된 모든 빈의 값을 가져올 수 있다.
+
+```java
+
+public class AllBeanTest {
+    @Test
+    void findAllBean() {
+        //스프링 컨테이너에 빈 등록한거
+        ApplicationContext ac = new AnnotationConfigApplicationContext(AutoAppConfig.class, DiscountService.class);
+        DiscountService discountService = ac.getBean(DiscountService.class);
+        Member member = new Member(1L, "userA", Grade.VIP);
+
+        int discountPrice = discountService.discount(member, 10000, "fixDiscountPolicy");
+
+        assertThat(discountService).isInstanceOf(DiscountService.class);
+        assertThat(discountPrice).isEqualTo(1000);
+
+    }
+
+    static class DiscountService{
+        private final Map<String, DiscountPolicy> policyMap;
+        private final List<DiscountPolicy> policyList;
+
+        @Autowired
+        DiscountService(Map<String, DiscountPolicy> policyMap, List<DiscountPolicy> policyList) {
+            this.policyMap = policyMap;
+            this.policyList = policyList;
+
+            System.out.println("policyMap = " + policyMap);
+            System.out.println("policyList = " + policyList);
+        }
+
+
+        public int discount(Member member, int price, String discountCode) {
+            DiscountPolicy discountPolicy = policyMap.get(discountCode);
+
+            System.out.println("discountCode = " + discountCode);
+            System.out.println("discountPolicy = " + discountPolicy);
+            return discountPolicy.discount(member, price);
+        }
+    }
+}
+
+```
