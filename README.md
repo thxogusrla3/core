@@ -127,6 +127,7 @@ public class OrderServiceImpl implements OrderService{
 ```
 
 # IoC, DI 그리고 컨테이너
+> AppConfig 처럼 객체를 생성하고 관리하면서 의존관계를 연결해주는 것을 IoC 컨테이너 또는 DI 컨테이너 라 한다.
 1. IoC(제어의 역전)
    - 프로그램의 제어 흐름을 직접 제어하는 것이 아닌 외부에서 실행 및 권한을 갖는 것
    - OrderServiceImpl은 어떤 구현 객체가 사용될지 모름
@@ -136,9 +137,9 @@ public class OrderServiceImpl implements OrderService{
    - 애플리케이션 "실행 시점(런타임)"에 외부에서 실제 구현 객체를 생성하고 클라이언트에 전달해서 클라이언트와 서버의 실제의 의존관계가 연결되는 것을 "의존관계 주입"이라 한다.
    - 객체 인스턴스를 생성하고 그 참조값을 전달해서 연결된다.
 
-> AppConfig 처럼 객체를 생성하고 관리하면서 의존관계를 연결해주는 것을 IoC 컨테이너 또는 DI 컨테이너 라 한다.
 
 # 스프링으로 전환하기
+> ApplicationContext ac = new AnnotationConfigApplicationContext(AppConfig.class); AppConfig.class 가 스프링 컨테이너가 되며 그 안에 있는 @Bean 이 스프링 빈으로 등록된다.
 1. ApplicationContext 
    - 스프링 컨테이너라 한다.
    - @Configuration 어노테이션이 붙은 AppConfig의 @Bean이 붙은 메소드들을 다 스프링 컨테이너에 등록한다.
@@ -151,7 +152,7 @@ class container{
     MemberService memberService = appConfig.memberService();
     OrderService orderService = appConfig.orderService();    
 
-    //스프링 컨테이너를 사용 한 소스
+    //스프링 컨테이너를 사용 한 소스 AppConfig.class 가 스프링 컨테이너가 되었고 이 안에 있는 @Bean 이 스프링 빈으로 등록된다.
     ApplicationContext ac = new AnnotationConfigApplicationContext(AppConfig.class);
     MemberService memberService = ac.getBean("memberService", MemberService.class);
     OrderService orderService = ac.getBean("orderService", OrderService.class);
