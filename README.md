@@ -627,3 +627,15 @@ public class AllBeanTest {
 }
 
 ```
+
+# 빈 등록 초기화, 소멸 메서드
+1. 초기화
+> 의존관계 주입 이후에 실행되는 것.
+- InitializingBean - afterPropertiesSet()
+  - 오래된 방법으로 잘사용하지 않음.
+- @Bean(initMethod = "메소드명", destroyMethod = "close")
+  - destroyMethod 속성에는 추론 기능이 있음.
+  - 외부 라이브러리에서 사용이 가능하다.
+- @PostConstruct, @PreDestroy
+  - 가장 권장하는 초기화, 소멸 방법임
+  - 외부 라이브러리 사용은 불가능하다.
