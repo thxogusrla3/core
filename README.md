@@ -651,3 +651,36 @@ public class AllBeanTest {
 
 # 프로토타입 스코프 - 싱글톤 빈과 함께 사용시 문제점
 - 싱글톤 빈 안에서 프로토타입 빈 을 사용하게 되면 싱글톤 안에서 이미 한번만 생성이 되기 때문에 쓰던 프로토타입 빈을 또 계속쓰게 되는 문제가 있다.
+
+# 프로토타입 스코프 - 싱글톤 빈과 함께 사용시 Provider 로 문제 해결
+> Dependency Lookup(DL) 이란 의존성 주입(DI) 방식이 아닌 직접 찾아서 의존관계 탐색이라 한다. DL 을 사용해서 문제를 해결한다.
+- ObjectFactory, ObjectProvider, JSR-330 Provider 를 사용한다.
+- ObjectFactory, ObjectProvider 스프링에서 제공하기 때문에 사용이 스프링 컨테이너만 가능하다
+- JSR-330 Provider 스프링 컨테이너 외에도 다른 컨테이너를 사용할 때 사용하면 된다
+```java
+class Provider {
+   @Autowired
+   private ObjectFactory<PrototypeBean> factoryProvider;
+
+   @Autowired
+   private ObjectProvider<PrototypeBean> provideProvider;
+   
+   @Autowired
+   private Provider<PrototypeBean> provider;
+   
+   public int logic() {
+      PrototypeBean prototypeBean = factoryProvider.getObject();
+      PrototypeBean prototypeBean = provideProvider.getObject();
+      PrototypeBean prototypeBean = provider.get();
+   }
+}
+```
+
+# 웹 스코프
+
+### 1. 웹 스코프 종류
+- request: HTTP 요청 하나가 들어오고 나갈 때 까지 유지되는 스코프, 각각의 HTTP 요청마다 별도의 빈 인스턴스가 생성되고 관리된다.
+- session: HTTP Session과 동일한 생명주기를 가지는 스코프
+- application: 서블릿 컨텍스트(ServletContext)와 동일한 생명주기를 가지는 스코프
+- websocket: 웹 소켓과 동일한 생명주기를 가지는 스코프
+
